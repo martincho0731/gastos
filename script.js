@@ -4,6 +4,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
 
+    // Crear botón de instalación
     const installBtn = document.createElement('button');
     installBtn.textContent = "📥 Instalar la App";
     installBtn.style.position = "fixed";
@@ -15,6 +16,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     installBtn.style.border = "none";
     installBtn.style.borderRadius = "5px";
     installBtn.style.cursor = "pointer";
+    installBtn.style.zIndex = "1000";
 
     installBtn.addEventListener('click', () => {
         deferredPrompt.prompt();
@@ -29,6 +31,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
     document.body.appendChild(installBtn);
 });
+
 
 // IndexedDB
 const dbName = "GastosDB";
