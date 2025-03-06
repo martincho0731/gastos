@@ -1,8 +1,8 @@
 {
-  "name": "Gestión de Gastos",
+  "name": "Gestor de Finanzas",
   "short_name": "Gastos",
-  "description": "Una PWA para gestionar ingresos y gastos de forma fácil y rápida.",
-  "start_url": "/",
+  "description": "Una PWA para gestionar ingresos y gastos fácilmente.",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",

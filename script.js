@@ -1,7 +1,60 @@
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Crear botón de instalación
+    const installBtn = document.createElement('button');
+    installBtn.textContent = "📥 Instalar la App";
+    installBtn.style.position = "fixed";
+    installBtn.style.bottom = "20px";
+    installBtn.style.right = "20px";
+    installBtn.style.padding = "10px";
+    installBtn.style.background = "#008080";
+    installBtn.style.color = "#fff";
+    installBtn.style.border = "none";
+    installBtn.style.borderRadius = "5px";
+    installBtn.style.cursor = "pointer";
+
+    installBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+            if (choice.outcome === 'accepted') {
+                console.log("PWA instalada");
+                installBtn.remove();
+            }
+            deferredPrompt = null;
+        });
+    });
+
+    document.body.appendChild(installBtn);
+});
 
 /* JavaScript - script.js */
+let deferredPrompt;
 
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Mostrar botón de instalación
+    const installBtn = document.createElement('button');
+    installBtn.textContent = "Instalar la app";
+    installBtn.style.display = "block";
+    installBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+            if (choice.outcome === 'accepted') {
+                console.log("PWA instalada");
+            }
+            deferredPrompt = null;
+        });
+    });
+    document.body.appendChild(installBtn);
+});
+ 
 const dbName = "GastosDB";
 let db;
 
