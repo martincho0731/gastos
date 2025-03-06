@@ -1,4 +1,3 @@
-// service-worker.js
 self.addEventListener("install", event => {
     console.log("Service Worker instalado");
     event.waitUntil(
@@ -7,7 +6,7 @@ self.addEventListener("install", event => {
                 "/",
                 "/index.html",
                 "/styles.css",
-                "/app.js",
+                "/script.js",
                 "/manifest.json",
                 "/icons/icon-192x192.png",
                 "/icons/icon-512x512.png"
@@ -23,3 +22,4 @@ self.addEventListener("fetch", event => {
         })
     );
 });
+
