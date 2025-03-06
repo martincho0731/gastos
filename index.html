@@ -6,18 +6,17 @@
     <title>Gestor de Finanzas</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
-    <script src="script.js" defer></script>
+    <script defer src="script.js"></script>
+
     <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(reg => console.log("Service Worker registrado", reg))
-                        .catch(err => console.error("Error al registrar Service Worker", err));
-                });
-            }
-        </script>
-        
-        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log("✅ Service Worker registrado correctamente", reg.scope))
+                    .catch(err => console.error("❌ Error al registrar Service Worker", err));
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="app">
@@ -25,12 +24,12 @@
             <h1>💰 Gestor de Finanzas</h1>
             <p>Controla tus ingresos y gastos fácilmente</p>
         </header>
-        
+
         <main>
             <div class="balance">
                 <h2>Balance Actual: <span id="balance">$0.00</span></h2>
             </div>
-            
+
             <section class="form-section">
                 <h3>Agregar Movimiento</h3>
                 <form id="transaction-form">
@@ -43,104 +42,12 @@
                     <button type="submit">Agregar</button>
                 </form>
             </section>
-            
+
             <section class="transactions">
                 <h3>Historial de Movimientos</h3>
                 <ul id="transaction-list"></ul>
             </section>
         </main>
     </div>
-    
-    <script>
-        const dbName = "GastosDB";
-        let db;
-
-        const request = indexedDB.open(dbName, 1);
-
-        request.onupgradeneeded = function(event) {
-            db = event.target.result;
-            if (!db.objectStoreNames.contains("transactions")) {
-                db.createObjectStore("transactions", { keyPath: "id", autoIncrement: true });
-            }
-        };
-
-        request.onsuccess = function(event) {
-            db = event.target.result;
-            loadTransactions();
-        };
-
-        request.onerror = function(event) {
-            console.error("Error al abrir IndexedDB", event.target.error);
-        };
-
-        document.getElementById("transaction-form").addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            const concepto = document.getElementById("concepto").value;
-            const monto = parseFloat(document.getElementById("monto").value);
-            const tipo = document.getElementById("tipo").value;
-
-            if (!concepto || isNaN(monto)) return;
-
-            const transaction = { id: Date.now(), concepto, monto, tipo, date: new Date().toISOString() };
-            
-            const tx = db.transaction(["transactions"], "readwrite");
-            const store = tx.objectStore("transactions");
-            store.add(transaction);
-            
-            tx.oncomplete = function() {
-                loadTransactions();
-                document.getElementById("transaction-form").reset();
-            };
-        });
-
-        function loadTransactions() {
-            const tx = db.transaction(["transactions"], "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.getAll();
-
-            request.onsuccess = function() {
-                const transactions = request.result;
-                const list = document.getElementById("transaction-list");
-                list.innerHTML = "";
-                let balance = 0;
-
-                transactions.forEach(trans => {
-                    balance += trans.tipo === "ingreso" ? trans.monto : -trans.monto;
-                    const li = document.createElement("li");
-                    li.className = trans.tipo;
-                    li.innerHTML = `
-                        ${trans.concepto}: $${trans.monto.toFixed(2)} 
-                        <button onclick="editTransaction(${trans.id})">✏️</button>
-                        <button onclick="deleteTransaction(${trans.id})">🗑️</button>
-                    `;
-                    list.appendChild(li);
-                });
-                document.getElementById("balance").textContent = `$${balance.toFixed(2)}`;
-            };
-        }
-
-        function deleteTransaction(id) {
-            const tx = db.transaction(["transactions"], "readwrite");
-            const store = tx.objectStore("transactions");
-            store.delete(id);
-            tx.oncomplete = () => loadTransactions();
-        }
-
-        function editTransaction(id) {
-            const tx = db.transaction(["transactions"], "readonly");
-            const store = tx.objectStore("transactions");
-            const request = store.get(id);
-            
-            request.onsuccess = function() {
-                const trans = request.result;
-                document.getElementById("concepto").value = trans.concepto;
-                document.getElementById("monto").value = trans.monto;
-                document.getElementById("tipo").value = trans.tipo;
-                
-                deleteTransaction(id);
-            };
-        }
-    </script>
 </body>
 </html>

@@ -1,11 +1,9 @@
-
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
 
-    // Crear botón de instalación
     const installBtn = document.createElement('button');
     installBtn.textContent = "📥 Instalar la App";
     installBtn.style.position = "fixed";
@@ -22,7 +20,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(choice => {
             if (choice.outcome === 'accepted') {
-                console.log("PWA instalada");
+                console.log("✅ PWA instalada correctamente");
                 installBtn.remove();
             }
             deferredPrompt = null;
@@ -32,33 +30,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
     document.body.appendChild(installBtn);
 });
 
-/* JavaScript - script.js */
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    // Mostrar botón de instalación
-    const installBtn = document.createElement('button');
-    installBtn.textContent = "Instalar la app";
-    installBtn.style.display = "block";
-    installBtn.addEventListener('click', () => {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choice => {
-            if (choice.outcome === 'accepted') {
-                console.log("PWA instalada");
-            }
-            deferredPrompt = null;
-        });
-    });
-    document.body.appendChild(installBtn);
-});
- 
+// IndexedDB
 const dbName = "GastosDB";
 let db;
 
-// Abrir o crear la base de datos
+// Abrir base de datos
 const request = indexedDB.open(dbName, 1);
 
 request.onupgradeneeded = function(event) {
@@ -74,11 +50,11 @@ request.onsuccess = function(event) {
 };
 
 request.onerror = function(event) {
-    console.error("Error al abrir IndexedDB", event.target.error);
+    console.error("❌ Error al abrir IndexedDB", event.target.error);
 };
 
 // Agregar transacción
-function addTransaction(e) {
+document.getElementById("transaction-form").addEventListener("submit", function(e) {
     e.preventDefault();
 
     const concepto = document.getElementById("concepto").value;
@@ -87,18 +63,17 @@ function addTransaction(e) {
 
     if (!concepto || isNaN(monto)) return;
 
-    const transaction = { concepto, monto, tipo, date: new Date().toISOString() };
-    
+    const transaction = { id: Date.now(), concepto, monto, tipo, date: new Date().toISOString() };
+
     const tx = db.transaction(["transactions"], "readwrite");
     const store = tx.objectStore("transactions");
     store.add(transaction);
-    tx.oncomplete = () => {
+
+    tx.oncomplete = function() {
         loadTransactions();
         document.getElementById("transaction-form").reset();
     };
-}
-
-document.getElementById("transaction-form").addEventListener("submit", addTransaction);
+});
 
 // Cargar transacciones
 function loadTransactions() {
@@ -116,9 +91,37 @@ function loadTransactions() {
             balance += trans.tipo === "ingreso" ? trans.monto : -trans.monto;
             const li = document.createElement("li");
             li.className = trans.tipo;
-            li.textContent = `${trans.concepto}: $${trans.monto}`;
+            li.innerHTML = `
+                ${trans.concepto}: $${trans.monto.toFixed(2)} 
+                <button onclick="editTransaction(${trans.id})">✏️</button>
+                <button onclick="deleteTransaction(${trans.id})">🗑️</button>
+            `;
             list.appendChild(li);
         });
         document.getElementById("balance").textContent = `$${balance.toFixed(2)}`;
+    };
+}
+
+// Eliminar transacción
+function deleteTransaction(id) {
+    const tx = db.transaction(["transactions"], "readwrite");
+    const store = tx.objectStore("transactions");
+    store.delete(id);
+    tx.oncomplete = () => loadTransactions();
+}
+
+// Editar transacción
+function editTransaction(id) {
+    const tx = db.transaction(["transactions"], "readonly");
+    const store = tx.objectStore("transactions");
+    const request = store.get(id);
+    
+    request.onsuccess = function() {
+        const trans = request.result;
+        document.getElementById("concepto").value = trans.concepto;
+        document.getElementById("monto").value = trans.monto;
+        document.getElementById("tipo").value = trans.tipo;
+
+        deleteTransaction(id);
     };
 }
