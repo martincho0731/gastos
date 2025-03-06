@@ -2,7 +2,7 @@
   "name": "Gestión de Gastos",
   "short_name": "Gastos",
   "description": "Una PWA para gestionar ingresos y gastos de forma fácil y rápida.",
-  "id": "/gastos",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -20,25 +20,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/screen1.png",
-      "sizes": "1080x1920",
-      "type": "image/png"
-    },
-    {
-      "src": "/screenshots/screen2.png",
-      "sizes": "1080x1920",
-      "type": "image/png"
-    }
-  ],
-  "categories": ["finance", "productivity"],
-  "related_applications": [
-    {
-      "platform": "play",
-      "url": "https://play.google.com/store/apps/details?id=com.tuapp.gastos"
-    }
-  ],
-  "prefer_related_applications": false
+  ]
 }
