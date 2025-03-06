@@ -2,11 +2,9 @@
   "name": "Gestión de Gastos",
   "short_name": "Gastos",
   "description": "Una PWA para gestionar ingresos y gastos de forma fácil y rápida.",
-  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#008080",
   "icons": [
@@ -22,3 +20,4 @@
     }
   ]
 }
+
